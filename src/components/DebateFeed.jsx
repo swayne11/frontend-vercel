@@ -459,7 +459,38 @@ export default function DebateFeed() {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
-      `}</style>
+                `}</style>
+
+            {/* LANDING PAGE / INITIALIZATION OVERLAY */}
+            {(streamStatus !== 'connected' || topic === 'Initializing...') && (
+                <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center text-white animate-fade-in">
+                    <div className="flex flex-col items-center space-y-6">
+                        {/* Logo / Icon Placeholder */}
+                        <div className="w-24 h-24 bg-red-600 rounded-full flex items-center justify-center animate-pulse">
+                            <Activity className="w-12 h-12 text-white" />
+                        </div>
+
+                        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-center leading-none">
+                            Agent<br />
+                            <span className="text-red-600">Debate</span> Arena
+                        </h1>
+
+                        <div className="flex items-center space-x-3 text-white/50 font-mono text-sm uppercase tracking-widest mt-8">
+                            {streamStatus === 'error' ? (
+                                <>
+                                    <span className="w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+                                    <span>Connection Lost - Retrying...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
+                                    <span>Initializing Feed...</span>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 }
