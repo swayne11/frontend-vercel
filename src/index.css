@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+:root {
+  --bg-color: #1a1a1a;
+  --text-color: #e0e0e0;
+  --accent: #646cff;
+  --accent-hover: #535bf2;
+  --pro-color: #2e7d32;
+  --con-color: #c62828;
+  --bubble-bg: #2d2d2d;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header h1 {
+  text-align: center;
+  color: var(--accent);
+}
+
+.controls {
+  margin-bottom: 2rem;
+}
+
+form {
+  display: flex;
+  gap: 1rem;
+}
+
+input {
+  flex: 1;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #333;
+  color: white;
+  font-size: 1rem;
+}
+
+button {
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--accent);
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+button:disabled {
+  background-color: #444;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+}
+
+button.stop-btn {
+  background-color: #d32f2f;
+}
+
+button.stop-btn:hover {
+  background-color: #b71c1c;
+}
+
+.error {
+  color: #ff5252;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.chat-feed {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-right: 1rem;
+}
+
+.structured-content {
+  border-bottom: 1px solid #333;
+  padding-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Fallback for raw text */
+.raw-text {
+  font-family: monospace;
+  white-space: pre-wrap;
+  color: #888;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed #333;
+}

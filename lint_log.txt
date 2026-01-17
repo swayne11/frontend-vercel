@@ -1,0 +1,14 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+D:\Projects\Debate\25_1226_Debate-004\frontend-vercel\src\components\AdminPanel.jsx
+    7:11  error  'navigate' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  197:18  error  'e' is defined but never used                                                             no-unused-vars
+
+D:\Projects\Debate\25_1226_Debate-004\frontend-vercel\src\components\DebateFeed.jsx
+  19:5  error  Parsing error: Identifier 'Cloud' has already been declared
+
+✖ 3 problems (3 errors, 0 warnings)
+

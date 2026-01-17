@@ -1,0 +1,8 @@
+{
+    "post": {
+        "participant_name": "{participant_name}",
+        "headline": "Compelling Three Words",
+        "copy": "This is the supporting description area. It is designed to hold a maximum of one hundred and fifty characters to keep the message concise.",
+        "ai_model": "{model_name}"
+    }
+}
