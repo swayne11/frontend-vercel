@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import DebateFeed from './components/DebateFeed'
 import AdminPanel from './components/AdminPanel'
+import MobileFeed from './components/MobileFeed'
 
 function App() {
   // Simple port-based routing
@@ -15,7 +16,7 @@ function App() {
       ) : (
         <Routes>
           <Route path="/" element={<DebateFeed />} />
-
+          <Route path="/mobile" element={<MobileFeed />} />
         </Routes>
       )}
     </BrowserRouter>
