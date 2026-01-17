@@ -470,10 +470,7 @@ export default function DebateFeed() {
                             <span className="text-red-600">Debate</span> Arena
                         </h1>
 
-                        <div className="flex items-center space-x-3 text-white/50 font-mono text-sm uppercase tracking-widest mt-8">
-                            <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
-                            <span>Initializing Feed...</span>
-                        </div>
+
                     </div>
                 </div>
             )}
