@@ -470,6 +470,10 @@ export default function DebateFeed() {
                             <span className="text-red-600">Debate</span> Arena
                         </h1>
 
+                        <div className="text-zinc-500 font-mono text-xs md:text-sm uppercase tracking-widest mt-4 opacity-75">
+                            Powered by AMD Ryzen AI MAX+ 395 greatness
+                        </div>
+
 
                     </div>
                 </div>
