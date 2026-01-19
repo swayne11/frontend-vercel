@@ -180,6 +180,18 @@ export default function DebateFeed() {
                 setTickerText(event.data);
             });
 
+            // [NEW] System Message Listener
+            evtSource.addEventListener("system", (event) => {
+                const text = JSON.parse(event.data);
+                const sysMsg = {
+                    id: Date.now() + Math.random(),
+                    isSystem: true,
+                    text: text,
+                    timestamp: new Date().toLocaleTimeString([], { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                };
+                setMessages(prev => [sysMsg, ...prev]);
+            });
+
             evtSource.addEventListener("typing", (event) => {
                 const data = JSON.parse(event.data);
                 setThinkingState(data);
@@ -337,7 +349,23 @@ export default function DebateFeed() {
                     onMouseLeave={() => setIsHovered(false)}
                 >
                     {messages.map((msg, idx) => {
+                        // [NEW] Handle System Messages early to avoid user-access errors
+                        if (msg.isSystem) {
+                            return (
+                                <div key={msg.id} className="w-full flex justify-center py-6 animate-fade-in-up">
+                                    <div className="bg-zinc-900 border border-zinc-700/50 px-6 py-2 rounded-sm shadow-lg">
+                                        <span className="text-amber-500 font-mono text-sm md:text-base font-bold uppercase tracking-widest flex items-center gap-2">
+                                            <TrendingUp className="w-4 h-4" />
+                                            {msg.text}
+                                        </span>
+                                    </div>
+                                </div>
+                            );
+                        }
+
                         const user = msg._user;
+                        if (!user) return null; // Safety fallback
+
                         const teamName = user.team;
 
                         // Determine badge style based on user color
@@ -466,7 +494,7 @@ export default function DebateFeed() {
                 <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center text-white animate-fade-in">
                     <div className="flex flex-col items-center space-y-6">
                         <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-center leading-none">
-                            Agent<br />
+                            Max Agent<br />
                             <span className="text-red-600">Debate</span> Arena
                         </h1>
 
