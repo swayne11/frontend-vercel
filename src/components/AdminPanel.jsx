@@ -22,6 +22,9 @@ function AdminPanel() {
 
     const [headlineLimit, setHeadlineLimit] = useState('3-5')
     const [copyLimit, setCopyLimit] = useState('20-50')
+    const [chaosThreshold, setChaosThreshold] = useState(0.7) // [NEW] Governance
+    const [subissues, setSubissues] = useState([]) // [NEW] Pivot Deck
+    const [newSubissue, setNewSubissue] = useState('')
     const [feedSpeed, setFeedSpeed] = useState(2000) // [NEW]
     const [debateFormat, setDebateFormat] = useState('individual') // [NEW] individual, teams, collective
     const [tickerText, setTickerText] = useState('8 LOCAL AI MODELS debating in real time on Ryzen AI Max+ 395')
@@ -141,6 +144,7 @@ function AdminPanel() {
             if (data.feed_speed) setFeedSpeed(data.feed_speed)
             if (data.debate_format) setDebateFormat(data.debate_format)
             if (typeof data.continuous_mode !== 'undefined') setContinuousMode(data.continuous_mode)
+            if (data.subissues) setSubissues(data.subissues)
             setParticipants(data.participants)
 
             if (data.amd_profile) {
@@ -165,6 +169,8 @@ function AdminPanel() {
                 topic,
                 headline, // [NEW]
 
+                headline, // [NEW]
+                subissues,
                 participants,
                 scenario_config: scenarioConfig, // Save structured data
                 scenario: compileScenario(scenarioConfig), // Compile just in case
@@ -276,6 +282,16 @@ function AdminPanel() {
 
 
     // [DIRECTOR MODE] Compilation Logic
+    const addSubissue = () => {
+        if (!newSubissue.trim()) return
+        setSubissues([...subissues, newSubissue.trim()])
+        setNewSubissue('')
+    }
+
+    const removeSubissue = (idx) => {
+        setSubissues(prev => prev.filter((_, i) => i !== idx))
+    }
+
     // [DIRECTOR MODE] Compilation Logic
     const compileScenario = (config) => {
         // Just return the raw context as the full scenario now
@@ -367,6 +383,16 @@ ${p.speaking_style || 'Natural'}`
         }
     }
 
+    const triggerTether = async () => {
+        try {
+            await fetch(`${API_BASE_URL}/debate/tether`, { method: 'POST' })
+            alert("Emergency Tether Triggered!")
+        } catch (err) {
+            console.error(err)
+            alert("Tether Failed")
+        }
+    }
+
     const updateDebate = async () => {
         try {
             await fetch(`${API_BASE_URL}/debate/update`, {
@@ -378,10 +404,14 @@ ${p.speaking_style || 'Natural'}`
                     scenario: scenario,
                     ticker_text: tickerText,
                     feed_speed: feedSpeed,
-                    debate_format: debateFormat
+                    debate_format: debateFormat,
+                    headline_limit: headlineLimit,
+                    copy_limit: copyLimit,
+                    chaos_threshold: parseFloat(chaosThreshold),
+                    subissues: subissues
                 })
             })
-            alert("Topic, Headline, Scenario & Ticker Updated!")
+            alert("Topic, Headline, Scenario, Ticker & Pivot Deck Updated!")
         } catch (err) {
             console.error(err)
             alert("Update Failed")
@@ -688,6 +718,79 @@ ${p.speaking_style || 'Natural'}`
                                 <option value="teams">Teams (Alternating A vs B)</option>
                                 <option value="collective">Collective (Chaotic / Random)</option>
                             </select>
+                        </div>
+
+                        {/* NEW GOVERNANCE SECTION */}
+                        <div className="section" style={{ gridColumn: "1 / -1", border: "1px solid #555", padding: "1rem", borderRadius: "8px", background: "#301c1c" }}>
+                            <h3 style={{ marginTop: 0, color: "#ef4444" }}>⚖️ Governance & Moderation</h3>
+
+                            <div style={{ display: "grid", gap: "1rem" }}>
+                                <div>
+                                    <div style={{ display: "flex", justifySelf: "space-between", justifyContent: "space-between" }}>
+                                        <label>Chaos Sensitivity (Judge Threshold)</label>
+                                        <span style={{ color: "#fbbf24", fontFamily: "monospace" }}>{chaosThreshold}</span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="0.1"
+                                        max="1.0"
+                                        step="0.05"
+                                        value={chaosThreshold}
+                                        onChange={(e) => setChaosThreshold(e.target.value)}
+                                        style={{ width: "100%" }}
+                                    />
+                                    <p style={{ fontSize: "0.8rem", color: "#aaa", margin: 0 }}>Lower = More Sensitive (Triggers Tether sooner)</p>
+                                </div>
+
+                                <button
+                                    onClick={triggerTether}
+                                    style={{
+                                        width: "100%",
+                                        padding: "0.75rem",
+                                        background: "#451a1a",
+                                        color: "#fca5a5",
+                                        border: "1px solid #7f1d1d",
+                                        fontWeight: "bold",
+                                        borderRadius: "0.5rem",
+                                        cursor: "pointer"
+                                    }}
+                                >
+                                    ⚠️ EMERGENCY TETHER
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* PIVOT DECK SECTION */}
+                        <div className="section" style={{ gridColumn: "1 / -1", border: "1px solid #555", padding: "1rem", borderRadius: "8px", background: "#1c2b30" }}>
+                            <h3 style={{ marginTop: 0, color: "#22d3ee" }}>🔄 Pivot Deck (Sub-issues)</h3>
+                            <p style={{ fontSize: "0.8rem", color: "#aaa", marginTop: "-0.5rem" }}>
+                                When the debate stagnates or chaos peaks, the Narrator will force a pivot to one of these sub-issues.
+                            </p>
+
+                            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                                <input
+                                    type="text"
+                                    value={newSubissue}
+                                    onChange={e => setNewSubissue(e.target.value)}
+                                    placeholder="Add a sub-issue (e.g. 'Economic Impact')..."
+                                    style={{ flex: 1, padding: "0.5rem" }}
+                                    onKeyDown={e => e.key === 'Enter' && addSubissue()}
+                                />
+                                <button onClick={addSubissue} style={{ background: "#0e7490", color: "white", padding: "0.5rem 1rem" }}>Add</button>
+                            </div>
+
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                                {subissues.length === 0 && <span style={{ color: "#666", fontStyle: "italic" }}>No sub-issues defined.</span>}
+                                {subissues.map((issue, idx) => (
+                                    <div key={idx} style={{ background: "#222", padding: "0.25rem 0.75rem", borderRadius: "999px", display: "flex", alignItems: "center", gap: "0.5rem", border: "1px solid #333" }}>
+                                        <span>{issue}</span>
+                                        <button
+                                            onClick={() => removeSubissue(idx)}
+                                            style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", padding: 0, fontSize: "1.2rem", lineHeight: 1 }}
+                                        >×</button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
 

@@ -351,14 +351,12 @@ export default function DebateFeed() {
 
                         {currentUser && (
                             <div className="flex flex-col items-end animate-fade-in-up">
-                                {isThinking && (
-                                    <div className="text-yellow-300 text-[10px] md:text-xs font-black uppercase tracking-widest animate-pulse mb-0.5 flex items-center gap-1">
-                                        <span>Thinking</span>
-                                        <span className="w-1 h-1 bg-yellow-300 rounded-full"></span>
-                                        <span className="w-1 h-1 bg-yellow-300 rounded-full animation-delay-75"></span>
-                                        <span className="w-1 h-1 bg-yellow-300 rounded-full animation-delay-150"></span>
-                                    </div>
-                                )}
+                                <div className={`text-yellow-300 text-[10px] md:text-xs font-black uppercase tracking-widest mb-0.5 flex items-center gap-1 transition-opacity duration-200 ${isThinking ? 'opacity-100 animate-pulse' : 'opacity-0'}`}>
+                                    <span>Thinking</span>
+                                    <span className="w-1 h-1 bg-yellow-300 rounded-full"></span>
+                                    <span className="w-1 h-1 bg-yellow-300 rounded-full animation-delay-75"></span>
+                                    <span className="w-1 h-1 bg-yellow-300 rounded-full animation-delay-150"></span>
+                                </div>
                                 <div className="font-bold text-sm md:text-xl uppercase tracking-tighter text-white leading-none">
                                     {currentUser.name}
                                 </div>
