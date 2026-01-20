@@ -80,6 +80,7 @@ export default function DebateFeed() {
     const [isReconnecting, setIsReconnecting] = useState(false);
     // eslint-disable-next-line no-unused-vars
     const [participants, setParticipants] = useState({});
+    const [tokenStats, setTokenStats] = useState({ tps: 0, total_tokens: 0 }); // [NEW]
 
     // Staggered Loading State
     // Staggered Loading State
@@ -165,6 +166,13 @@ export default function DebateFeed() {
                 setTopic(data.topic);
                 setDebateHeadline(data.headline || ""); // [NEW]
                 if (data.ticker) setTickerText(data.ticker);
+                if (data.stats) setTokenStats(data.stats); // [NEW]
+            });
+
+            // [NEW] Stats Listener
+            evtSource.addEventListener("stats", (event) => {
+                const data = JSON.parse(event.data);
+                setTokenStats(data);
             });
 
             // [NEW] Handle live config updates
@@ -181,16 +189,16 @@ export default function DebateFeed() {
             });
 
             // [NEW] System Message Listener
-            evtSource.addEventListener("system", (event) => {
-                const text = JSON.parse(event.data);
-                const sysMsg = {
-                    id: Date.now() + Math.random(),
-                    isSystem: true,
-                    text: text,
-                    timestamp: new Date().toLocaleTimeString([], { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' })
-                };
-                setMessages(prev => [sysMsg, ...prev]);
-            });
+            // evtSource.addEventListener("system", (event) => {
+            //     const text = JSON.parse(event.data);
+            //     const sysMsg = {
+            //         id: Date.now() + Math.random(),
+            //         isSystem: true,
+            //         text: text,
+            //         timestamp: new Date().toLocaleTimeString([], { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            //     };
+            //     setMessages(prev => [sysMsg, ...prev]);
+            // });
 
             evtSource.addEventListener("typing", (event) => {
                 const data = JSON.parse(event.data);
@@ -326,14 +334,37 @@ export default function DebateFeed() {
                     </div>
 
                     {/* Right: User Profile Data (Featured or Thinking) */}
-                    {currentUser && (
-                        <div className="shrink-0 animate-fade-in-up mt-1 md:mt-0 w-full md:w-auto text-left md:text-right">
-                            <div className="font-bold text-sm md:text-xl uppercase tracking-tighter text-white/90">
-                                {isThinking && <span className="text-yellow-300 mr-2 animate-pulse">THINKING:</span>}
-                                {currentUser.name}
+                    <div className="shrink-0 flex flex-col items-end w-full md:w-auto text-left md:text-right mt-1 md:mt-0">
+
+                        {/* [NEW] Token Stats Display - Technical/Broadcast Style */}
+                        <div className="flex items-center gap-3 text-[10px] md:text-xs font-mono font-bold text-white/80 mb-2 bg-black/20 px-2 py-1 rounded-sm border border-black/10">
+                            <div className="flex items-center gap-1.5">
+                                <Zap className="w-3 h-3 text-yellow-300" fill="currentColor" />
+                                <span className="text-yellow-200 tracking-wider">{tokenStats.tps} TPS</span>
+                            </div>
+                            <div className="w-px h-3 bg-white/20"></div>
+                            <div className="flex items-center gap-1.5">
+                                <Cpu className="w-3 h-3" />
+                                <span className="tracking-wider">{(tokenStats.total_tokens / 1000).toFixed(1)}k TOKENS</span>
                             </div>
                         </div>
-                    )}
+
+                        {currentUser && (
+                            <div className="flex flex-col items-end animate-fade-in-up">
+                                {isThinking && (
+                                    <div className="text-yellow-300 text-[10px] md:text-xs font-black uppercase tracking-widest animate-pulse mb-0.5 flex items-center gap-1">
+                                        <span>Thinking</span>
+                                        <span className="w-1 h-1 bg-yellow-300 rounded-full"></span>
+                                        <span className="w-1 h-1 bg-yellow-300 rounded-full animation-delay-75"></span>
+                                        <span className="w-1 h-1 bg-yellow-300 rounded-full animation-delay-150"></span>
+                                    </div>
+                                )}
+                                <div className="font-bold text-sm md:text-xl uppercase tracking-tighter text-white leading-none">
+                                    {currentUser.name}
+                                </div>
+                            </div>
+                        )}
+                    </div>{/* End Right Column */}
 
                     {/* Hover to Pause Instruction - Bottom Right */}
                     <div className="absolute bottom-2 right-4 hidden md:flex items-center space-x-2 text-white/90 animate-pulse">
@@ -351,16 +382,7 @@ export default function DebateFeed() {
                     {messages.map((msg, idx) => {
                         // [NEW] Handle System Messages early to avoid user-access errors
                         if (msg.isSystem) {
-                            return (
-                                <div key={msg.id} className="w-full flex justify-center py-6 animate-fade-in-up">
-                                    <div className="bg-zinc-900 border border-zinc-700/50 px-6 py-2 rounded-sm shadow-lg">
-                                        <span className="text-amber-500 font-mono text-sm md:text-base font-bold uppercase tracking-widest flex items-center gap-2">
-                                            <TrendingUp className="w-4 h-4" />
-                                            {msg.text}
-                                        </span>
-                                    </div>
-                                </div>
-                            );
+                            return null;
                         }
 
                         const user = msg._user;
