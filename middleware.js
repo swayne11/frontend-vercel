@@ -9,6 +9,15 @@ export const config = {
     ],
 };
 
+// Helper: Parse cookies manually from standard Request header
+function getCookie(request, name) {
+    const cookieString = request.headers.get('cookie');
+    if (!cookieString) return null;
+
+    const matches = cookieString.match(new RegExp(`(?:^|; )` + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + `=([^;]*)`));
+    return matches ? decodeURIComponent(matches[1]) : null;
+}
+
 export default async function middleware(request) {
     try {
         // 1. Safe Env Access & Sanitization
@@ -54,8 +63,9 @@ export default async function middleware(request) {
             }
         }
 
-        // 5. Token Extraction
-        const token = request.cookies.get('CF_Authorization')?.value;
+        // 5. Token Extraction (Standard Web API)
+        const token = getCookie(request, 'CF_Authorization');
+
         if (!token) {
             // Return 403 to indicate unauthorized
             return new Response("Unauthorized: Missing CF_Authorization token.", { status: 403 });
