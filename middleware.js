@@ -1,9 +1,6 @@
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 // Configuration
-// We access envs inside the function to ensure they are available in all runtime contexts
-// preventing potential top-level access issues.
-
 let JWKS = null;
 
 export const config = {
@@ -13,67 +10,77 @@ export const config = {
 };
 
 export default async function middleware(request) {
-    const TEAM_DOMAIN = process.env.CF_TEAM_DOMAIN;
-    const AUDIENCE_TAG = process.env.CF_ACCESS_AUD;
-    const SKIP_AUTH = process.env.SKIP_AUTH_CHECK === 'true';
-
-    if (SKIP_AUTH) {
-        return;
-    }
-
-    if (!TEAM_DOMAIN || !AUDIENCE_TAG) {
-        console.error("Middleware: Missing CF_TEAM_DOMAIN or CF_ACCESS_AUD env vars");
-        return new Response(
-            `Configuration Error: Missing Cloudflare Access settings in Vercel.
-       ensure CF_TEAM_DOMAIN and CF_ACCESS_AUD are strictly set.
-       Current Domain: ${TEAM_DOMAIN ? 'Set' : 'Missing'}
-       Current Aud: ${AUDIENCE_TAG ? 'Set' : 'Missing'}`,
-            { status: 500 }
-        );
-    }
-
-    // Lazy Initialization of JWKS to prevent top-level crashes
-    if (!JWKS) {
-        try {
-            let domainUrl = TEAM_DOMAIN;
-            if (!domainUrl.startsWith('https://')) {
-                domainUrl = `https://${domainUrl}`;
-            }
-            // Remove trailing slash if present
-            if (domainUrl.endsWith('/')) {
-                domainUrl = domainUrl.slice(0, -1);
-            }
-
-            const jwksUrl = new URL(`${domainUrl}/cdn-cgi/access/certs`);
-            JWKS = createRemoteJWKSet(jwksUrl);
-        } catch (err) {
-            console.error("Middleware Config Error:", err);
-            return new Response(`Configuration Error: Invalid CF_TEAM_DOMAIN. ${err.message}`, { status: 500 });
-        }
-    }
-
-    const token = request.cookies.get('CF_Authorization')?.value;
-
-    if (!token) {
-        return new Response("Unauthorized: Missing CF_Authorization token.", { status: 403 });
-    }
-
     try {
-        // Ensure domain is clean for issuer check
-        let issuer = TEAM_DOMAIN;
-        if (!issuer.startsWith('https://')) issuer = `https://${issuer}`;
-        if (issuer.endsWith('/')) issuer = issuer.slice(0, -1);
+        // 1. Safe Env Access & Sanitization
+        const teamDomainEnv = process.env.CF_TEAM_DOMAIN || "";
+        const audienceEnv = process.env.CF_ACCESS_AUD || "";
+        const skipAuthEnv = process.env.SKIP_AUTH_CHECK || "";
+
+        const TEAM_DOMAIN = teamDomainEnv.trim();
+        const AUDIENCE_TAG = audienceEnv.trim();
+        const SKIP_AUTH = skipAuthEnv.trim() === 'true';
+
+        // 2. Skip Logic
+        if (SKIP_AUTH) {
+            return;
+        }
+
+        // 3. Validation
+        if (!TEAM_DOMAIN || !AUDIENCE_TAG) {
+            console.error("Middleware: Missing Env Vars");
+            return new Response(
+                `Configuration Error: Missing CF_TEAM_DOMAIN or CF_ACCESS_AUD.
+         Got Domain length: ${TEAM_DOMAIN.length}
+         Got Aud length: ${AUDIENCE_TAG.length}`,
+                { status: 500 }
+            );
+        }
+
+        // 4. Lazy JWKS Init
+        if (!JWKS) {
+            try {
+                let domainUrl = TEAM_DOMAIN;
+                // Strip protocols and trails to normalize
+                domainUrl = domainUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+                const fullUrlStr = `https://${domainUrl}/cdn-cgi/access/certs`;
+                // Validate URL construction
+                const jwksUrl = new URL(fullUrlStr);
+
+                JWKS = createRemoteJWKSet(jwksUrl);
+            } catch (err) {
+                console.error("JWKS Init Error:", err);
+                return new Response(`Middleware Config Error: Invalid Domain URL. ${err.message}`, { status: 500 });
+            }
+        }
+
+        // 5. Token Extraction
+        const token = request.cookies.get('CF_Authorization')?.value;
+        if (!token) {
+            // Return 403 to indicate unauthorized
+            return new Response("Unauthorized: Missing CF_Authorization token.", { status: 403 });
+        }
+
+        // 6. JWT Verification
+        // Normalize issuer
+        let issuerDomain = TEAM_DOMAIN.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        const expectedIssuer = `https://${issuerDomain}`;
 
         await jwtVerify(token, JWKS, {
             audience: AUDIENCE_TAG,
-            issuer: issuer,
+            issuer: expectedIssuer,
         });
 
-        // Valid
+        // Success - allow request to continue
         return;
 
-    } catch (error) {
-        console.error("JWT Verification Failed:", error.message);
-        return new Response(`Forbidden: Invalid Token. ${error.message}`, { status: 403 });
+    } catch (globalErr) {
+        // Catch-all for runtime crashes (e.g. library issues, crypto missing)
+        console.error("Middleware Global Crash:", globalErr);
+        return new Response(
+            `Internal Middleware Error: ${globalErr.message}. 
+       Stack: ${globalErr.stack ? 'Logged' : 'No Stack'}`,
+            { status: 500 }
+        );
     }
 }
