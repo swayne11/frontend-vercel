@@ -2,7 +2,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import DebateFeed from './components/DebateFeed'
 import AdminPanel from './components/AdminPanel'
 import MobileFeed from './components/MobileFeed'
-import { AuthProvider } from './contexts/AuthContext'
+import MobileFeed from './components/MobileFeed'
+import AuthWrapper from './components/AuthWrapper'
 
 function App() {
   // Simple port-based routing
@@ -11,18 +12,20 @@ function App() {
   const isAdminPort = window.location.port === '5175';
 
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        {isAdminPort ? (
-          <AdminPanel />
-        ) : (
-          <Routes>
-            <Route path="/" element={<DebateFeed />} />
-            <Route path="/mobile" element={<MobileFeed />} />
-          </Routes>
-        )}
-      </BrowserRouter>
-    </AuthProvider>
+    <BrowserRouter>
+      {isAdminPort ? (
+        <AdminPanel />
+      ) : (
+        <Routes>
+          <Route path="/" element={
+            <AuthWrapper>
+              <DebateFeed />
+            </AuthWrapper>
+          } />
+          <Route path="/mobile" element={<MobileFeed />} />
+        </Routes>
+      )}
+    </BrowserRouter>
   )
 }
 
