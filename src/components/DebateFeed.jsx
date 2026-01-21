@@ -145,7 +145,7 @@ export default function DebateFeed() {
 
         const connect = () => {
             console.log("Connecting to EventSource...");
-            evtSource = new EventSource(`${API_BASE_URL}/debate/stream?limit=14`);
+            evtSource = new EventSource(`${API_BASE_URL}/debate/stream?limit=14`, { withCredentials: true });
 
             evtSource.onopen = () => {
                 console.log("Connection opened");
