@@ -762,9 +762,9 @@ ${p.speaking_style || 'Natural'}`
 
                         {/* PIVOT DECK SECTION */}
                         <div className="section" style={{ gridColumn: "1 / -1", border: "1px solid #555", padding: "1rem", borderRadius: "8px", background: "#1c2b30" }}>
-                            <h3 style={{ marginTop: 0, color: "#22d3ee" }}>🔄 Pivot Deck (Sub-issues)</h3>
+                            <h3 style={{ marginTop: 0, color: "#22d3ee" }}>🔄 Pivot Deck (Subtopics)</h3>
                             <p style={{ fontSize: "0.8rem", color: "#aaa", marginTop: "-0.5rem" }}>
-                                When the debate stagnates or chaos peaks, the Narrator will force a pivot to one of these sub-issues.
+                                When the debate stagnates or chaos peaks, the Narrator will force a pivot to one of these subtopics.
                             </p>
 
                             <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
@@ -772,7 +772,7 @@ ${p.speaking_style || 'Natural'}`
                                     type="text"
                                     value={newSubissue}
                                     onChange={e => setNewSubissue(e.target.value)}
-                                    placeholder="Add a sub-issue (e.g. 'Economic Impact')..."
+                                    placeholder="Add a subtopic (e.g. 'Economic Impact')..."
                                     style={{ flex: 1, padding: "0.5rem" }}
                                     onKeyDown={e => e.key === 'Enter' && addSubissue()}
                                 />
