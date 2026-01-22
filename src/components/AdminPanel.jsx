@@ -13,12 +13,11 @@ function AdminPanel() {
     const [headline, setHeadline] = useState('') // [NEW]
 
     // [DIRECTOR MODE] Scenario State
-    const [scenarioConfig, setScenarioConfig] = useState({
-        context: '',
-        incident: '',
-        constraints: ''
+    const [directorState, setDirectorState] = useState({
+        knowledge: '',
+        instructions: ''
     })
-    const [scenario, setScenario] = useState('') // Native string for backend
+    // NOTE: 'scenario' state removed, direct access to directorState.knowledge used instead
 
     const [headlineLimit, setHeadlineLimit] = useState('3-5')
     const [copyLimit, setCopyLimit] = useState('20-50')
@@ -128,15 +127,20 @@ function AdminPanel() {
 
 
             // Hydrate Director Mode Config
-            if (data.scenario_config) {
-                setScenarioConfig(data.scenario_config)
-            }
-            // Fallback for legacy presets: put raw scenario int 'context' if config missing
-            else if (data.scenario) {
-                setScenarioConfig({ context: data.scenario, incident: '', constraints: '' })
+            if (data.director_state) {
+                setDirectorState(data.director_state)
+            } else if (data.scenario_config) {
+                setDirectorState({
+                    knowledge: data.scenario_config.context || '',
+                    instructions: data.instructions || ''
+                })
+            } else {
+                setDirectorState({
+                    knowledge: data.scenario || '',
+                    instructions: data.instructions || ''
+                })
             }
 
-            setScenario(data.scenario)
             setHeadlineLimit(data.headline_limit)
 
             setCopyLimit(data.copy_limit)
@@ -172,8 +176,9 @@ function AdminPanel() {
                 headline, // [NEW]
                 subissues,
                 participants,
-                scenario_config: scenarioConfig, // Save structured data
-                scenario: compileScenario(scenarioConfig), // Compile just in case
+                director_state: directorState, // Save structured data
+                scenario: directorState.knowledge,
+                instructions: directorState.instructions,
                 headline_limit: headlineLimit,
                 copy_limit: copyLimit,
                 ticker_text: tickerText,
@@ -293,10 +298,7 @@ function AdminPanel() {
     }
 
     // [DIRECTOR MODE] Compilation Logic
-    const compileScenario = (config) => {
-        // Just return the raw context as the full scenario now
-        return config.context
-    }
+    // compileScenario removed as we use direct fields now
 
     const compileInstructions = (p) => {
         return `[YOUR IDENTITY]
@@ -314,10 +316,7 @@ SECRET GOAL: ${p.secret_objective || 'None'} (Do not reveal this explicitly, but
 ${p.speaking_style || 'Natural'}`
     }
 
-    // Auto-update instructions string when director fields change
-    useEffect(() => {
-        setScenario(compileScenario(scenarioConfig))
-    }, [scenarioConfig])
+    // Auto-update removed
 
     // We also need to update participant instructions dynamically, but they are in an array.
     // So we'll do it on-the-fly during render or just compile at submit time?
@@ -342,7 +341,8 @@ ${p.speaking_style || 'Natural'}`
                     ...p,
                     instructions: p.instructions || compileInstructions(p)
                 })),
-                scenario,
+                scenario: directorState.knowledge,
+                instructions: directorState.instructions,
                 headline_limit: headlineLimit,
                 copy_limit: copyLimit,
                 ticker_text: tickerText,
@@ -400,8 +400,9 @@ ${p.speaking_style || 'Natural'}`
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     topic: topic,
-                    headline: headline, // [NEW]
-                    scenario: scenario,
+                    headline: headline,
+                    scenario: directorState.knowledge,
+                    instructions: directorState.instructions,
                     ticker_text: tickerText,
                     feed_speed: feedSpeed,
                     debate_format: debateFormat,
@@ -613,7 +614,7 @@ ${p.speaking_style || 'Natural'}`
 
                     <div className="controls-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                         <div className="section" style={{ gridColumn: "1 / -1", border: "1px solid #555", padding: "1rem", borderRadius: "8px", background: "#252525" }}>
-                            <h3 style={{ marginTop: 0, color: "#fbbf24" }}>🎬 Director's Deck: Scenario</h3>
+                            <h3 style={{ marginTop: 0, color: "#fbbf24" }}>🎬 Director's Desk</h3>
 
                             <div style={{ display: "grid", gap: "1rem" }}>
                                 <div>
@@ -626,23 +627,34 @@ ${p.speaking_style || 'Natural'}`
                                         style={{ width: "100%", padding: "0.5rem", background: "#333", color: "white", border: "1px solid #444", marginBottom: "0.5rem" }}
                                     />
                                 </div>
-                                <div>
-                                    <label>Scenario / Context</label>
-                                    <textarea
-                                        value={scenarioConfig.context}
-                                        onChange={e => setScenarioConfig(prev => ({ ...prev, context: e.target.value }))}
-                                        placeholder="Year 2050, Mars Colony. Water is scarce..."
-                                        rows="6"
-                                        style={{ width: "100%", background: "#222", color: "#ddd", marginBottom: "0.5rem", padding: "0.5rem", border: "1px solid #444" }}
-                                    />
-                                </div>
-                                <div style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.5rem" }}>
-                                    <details>
-                                        <summary>Preview Compiled Scenario</summary>
-                                        <pre style={{ whiteSpace: "pre-wrap", background: "#111", padding: "0.5rem" }}>
-                                            {compileScenario(scenarioConfig)}
-                                        </pre>
-                                    </details>
+
+                                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                                    <div style={{ border: "1px solid #444", padding: "1rem", borderRadius: "6px", background: "#222" }}>
+                                        <label style={{ color: "#fbbf24", display: "block", marginBottom: "0.5rem", fontSize: "1.1rem" }}>🌍 World Knowledge / Context</label>
+                                        <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.9rem", color: "#aaa" }}>
+                                            The facts, history, and status quo of the world. (Agents treat this as TRUTH).
+                                        </p>
+                                        <textarea
+                                            value={directorState.knowledge}
+                                            onChange={e => setDirectorState(prev => ({ ...prev, knowledge: e.target.value }))}
+                                            placeholder="Year 2050, Mars Colony. Water is scarce..."
+                                            rows="6"
+                                            style={{ width: "100%", background: "#111", color: "#ddd", padding: "0.75rem", border: "1px solid #333", resize: "vertical", borderRadius: "4px" }}
+                                        />
+                                    </div>
+                                    <div style={{ border: "1px solid #444", padding: "1rem", borderRadius: "6px", background: "#222" }}>
+                                        <label style={{ color: "#f87171", display: "block", marginBottom: "0.5rem", fontSize: "1.1rem" }}>🎬 Director Instructions</label>
+                                        <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.9rem", color: "#aaa" }}>
+                                            Directives for ALL agents (e.g. "Be aggressive", "Ignore facts"). (Agents treat this as COMMANDS).
+                                        </p>
+                                        <textarea
+                                            value={directorState.instructions}
+                                            onChange={e => setDirectorState(prev => ({ ...prev, instructions: e.target.value }))}
+                                            placeholder="All agents must speak in rhyme..."
+                                            rows="6"
+                                            style={{ width: "100%", background: "#111", color: "#ddd", padding: "0.75rem", border: "1px solid #333", resize: "vertical", borderRadius: "4px" }}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>

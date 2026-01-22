@@ -73,7 +73,6 @@ export default function DebateFeed() {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [topic, setTopic] = useState("Initializing...");
     const [debateHeadline, setDebateHeadline] = useState(""); // [NEW]
-    const [scenario, setScenario] = useState(""); // [NEW]
     const [tickerText, setTickerText] = useState("8 LOCAL AI MODELS debating in real time on Ryzen AI Max+ 395");
     const [feedSpeed, setFeedSpeed] = useState(2000); // [NEW] Default 2s
     const [streamStatus, setStreamStatus] = useState("disconnected");
@@ -166,7 +165,6 @@ export default function DebateFeed() {
                 const data = JSON.parse(event.data);
                 setTopic(data.topic);
                 setDebateHeadline(data.headline || ""); // [NEW]
-                setScenario(data.scenario || ""); // [NEW]
                 if (data.ticker) setTickerText(data.ticker);
                 if (data.stats) setTokenStats(data.stats); // [NEW]
             });
@@ -182,7 +180,6 @@ export default function DebateFeed() {
                 const data = JSON.parse(event.data);
                 if (data.topic) setTopic(data.topic);
                 if (data.headline !== undefined) setDebateHeadline(data.headline);
-                if (data.scenario !== undefined) setScenario(data.scenario);
                 if (data.ticker) setTickerText(data.ticker);
                 if (data.feed_speed) setFeedSpeed(data.feed_speed); // [NEW]
             });
@@ -334,11 +331,6 @@ export default function DebateFeed() {
                         <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none text-white animate-fade-in-up break-words">
                             {debateHeadline || topic || "WAITING FOR START..."}
                         </h1>
-                        {scenario && (
-                            <div className="text-lg md:text-xl font-bold uppercase tracking-wide text-white/80 mt-2 animate-fade-in-up">
-                                {scenario}
-                            </div>
-                        )}
                     </div>
 
                     {/* Right: User Profile Data (Featured or Thinking) */}
@@ -518,22 +510,24 @@ export default function DebateFeed() {
                 `}</style>
 
             {/* LANDING PAGE / INITIALIZATION OVERLAY */}
-            {(streamStatus !== 'connected' || topic === 'Initializing...') && (
-                <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center text-white animate-fade-in">
-                    <div className="flex flex-col items-center space-y-6">
-                        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-center leading-none">
-                            Max Agent<br />
-                            <span className="text-red-600">Debate</span> Arena
-                        </h1>
+            {
+                (streamStatus !== 'connected' || topic === 'Initializing...') && (
+                    <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center text-white animate-fade-in">
+                        <div className="flex flex-col items-center space-y-6">
+                            <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-center leading-none">
+                                Max Agent<br />
+                                <span className="text-red-600">Debate</span> Arena
+                            </h1>
 
-                        <div className="text-zinc-500 font-mono text-xs md:text-sm uppercase tracking-widest mt-4 opacity-75">
-                            Powered by AMD Ryzen AI MAX+ 395 greatness
+                            <div className="text-zinc-500 font-mono text-xs md:text-sm uppercase tracking-widest mt-4 opacity-75">
+                                Powered by AMD Ryzen AI MAX+ 395 greatness
+                            </div>
+
+
                         </div>
-
-
                     </div>
-                </div>
-            )}
+                )
+            }
         </div >
     );
 }
