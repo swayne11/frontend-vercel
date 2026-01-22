@@ -3,6 +3,8 @@ import DebateFeed from './components/DebateFeed'
 import AdminPanel from './components/AdminPanel'
 import MobileFeed from './components/MobileFeed'
 
+import AuthWrapper from './components/AuthWrapper'
+
 function App() {
   // Simple port-based routing
   // If on port 5175, show Admin Panel
@@ -15,7 +17,11 @@ function App() {
         <AdminPanel />
       ) : (
         <Routes>
-          <Route path="/" element={<DebateFeed />} />
+          <Route path="/" element={
+            <AuthWrapper>
+              <DebateFeed />
+            </AuthWrapper>
+          } />
           <Route path="/mobile" element={<MobileFeed />} />
         </Routes>
       )}
