@@ -23,15 +23,8 @@ export default async function handler(req) {
     // 2. Prepare Headers
     const headers = new Headers(req.headers);
 
-    // Inject Service Tokens
-    // Note: Env vars might be undefined in strict 'edge' if not explicitly allowed? 
-    // Should be fine in Vercel.
-    if (process.env.CF_ACCESS_CLIENT_ID) {
-        headers.set('CF-Access-Client-Id', process.env.CF_ACCESS_CLIENT_ID);
-    }
-    if (process.env.CF_ACCESS_CLIENT_SECRET) {
-        headers.set('CF-Access-Client-Secret', process.env.CF_ACCESS_CLIENT_SECRET);
-    }
+    // Service Tokens injection removed per user request
+
 
     // Clean up headers
     headers.delete('host'); // Let fetch set the host
