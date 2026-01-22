@@ -19,7 +19,6 @@ function AdminPanel() {
         constraints: ''
     })
     const [scenario, setScenario] = useState('') // Native string for backend
-    const [knowledge, setKnowledge] = useState('') // [NEW] Knowledge Base
 
     const [headlineLimit, setHeadlineLimit] = useState('3-5')
     const [copyLimit, setCopyLimit] = useState('20-50')
@@ -138,7 +137,6 @@ function AdminPanel() {
             }
 
             setScenario(data.scenario)
-            setKnowledge(data.knowledge || '') // [NEW]
             setHeadlineLimit(data.headline_limit)
 
             setCopyLimit(data.copy_limit)
@@ -176,7 +174,6 @@ function AdminPanel() {
                 participants,
                 scenario_config: scenarioConfig, // Save structured data
                 scenario: compileScenario(scenarioConfig), // Compile just in case
-                knowledge: knowledge, // [NEW]
                 headline_limit: headlineLimit,
                 copy_limit: copyLimit,
                 ticker_text: tickerText,
@@ -346,7 +343,6 @@ ${p.speaking_style || 'Natural'}`
                     instructions: p.instructions || compileInstructions(p)
                 })),
                 scenario,
-                knowledge, // [NEW]
                 headline_limit: headlineLimit,
                 copy_limit: copyLimit,
                 ticker_text: tickerText,
@@ -406,7 +402,6 @@ ${p.speaking_style || 'Natural'}`
                     topic: topic,
                     headline: headline, // [NEW]
                     scenario: scenario,
-                    knowledge: knowledge, // [NEW]
                     ticker_text: tickerText,
                     feed_speed: feedSpeed,
                     debate_format: debateFormat,
@@ -632,7 +627,7 @@ ${p.speaking_style || 'Natural'}`
                                     />
                                 </div>
                                 <div>
-                                    <label>Scenario Instructions (Rules/Setting)</label>
+                                    <label>Scenario / Context</label>
                                     <textarea
                                         value={scenarioConfig.context}
                                         onChange={e => setScenarioConfig(prev => ({ ...prev, context: e.target.value }))}
@@ -648,19 +643,6 @@ ${p.speaking_style || 'Natural'}`
                                             {compileScenario(scenarioConfig)}
                                         </pre>
                                     </details>
-                                </div>
-                                <div style={{ borderTop: "1px solid #444", paddingTop: "1rem", marginTop: "0.5rem" }}>
-                                    <label style={{ color: "#a5f3fc" }}>Knowledge Base (Facts & Data)</label>
-                                    <p style={{ fontSize: "0.8rem", color: "#888", margin: "0 0 0.5rem" }}>
-                                        Inject raw facts, statistics, or "truth" here.
-                                    </p>
-                                    <textarea
-                                        value={knowledge}
-                                        onChange={e => setKnowledge(e.target.value)}
-                                        placeholder="e.g. 'The base has 3 hours of oxygen remaining.'"
-                                        rows="4"
-                                        style={{ width: "100%", background: "#162024", color: "#a5f3fc", padding: "0.5rem", border: "1px solid #0891b2" }}
-                                    />
                                 </div>
                             </div>
                         </div>
