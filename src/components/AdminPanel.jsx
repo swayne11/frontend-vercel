@@ -378,7 +378,9 @@ ${p.speaking_style || 'Natural'}`
                     scenario: scenario,
                     ticker_text: tickerText,
                     feed_speed: feedSpeed,
-                    debate_format: debateFormat
+                    debate_format: debateFormat,
+                    headline_limit: headlineLimit,
+                    copy_limit: copyLimit
                 })
             })
             alert("Topic, Headline, Scenario & Ticker Updated!")
