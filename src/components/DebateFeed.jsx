@@ -357,7 +357,7 @@ export default function DebateFeed() {
                                     <span className="w-1 h-1 bg-yellow-300 rounded-full animation-delay-75"></span>
                                     <span className="w-1 h-1 bg-yellow-300 rounded-full animation-delay-150"></span>
                                 </div>
-                                <div className="font-bold text-sm md:text-xl uppercase tracking-tighter text-white leading-none truncate w-full">
+                                <div className="font-bold text-sm md:text-xl uppercase tracking-tighter text-white leading-tight break-words w-full">
                                     {currentUser.name}
                                 </div>
                             </div>
