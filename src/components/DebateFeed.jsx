@@ -338,9 +338,12 @@ export default function DebateFeed() {
 
                         {/* [NEW] Token Stats Display - Technical/Broadcast Style */}
                         <div className="flex items-center gap-3 text-[10px] md:text-xs font-mono font-bold text-white/80 mb-2 bg-black/20 px-2 py-1 rounded-sm border border-black/10">
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 text-left">
                                 <Zap className="w-3 h-3 text-yellow-300" fill="currentColor" />
-                                <span className="text-yellow-200 tracking-wider">{tokenStats.tps} TOKENS/SECOND</span>
+                                <div className="flex flex-col leading-none">
+                                    <span className="text-yellow-200 tracking-wider">{tokenStats.tps}</span>
+                                    <span className="text-[8px] uppercase tracking-wider opacity-70 whitespace-nowrap text-yellow-200">TOKENS/SEC</span>
+                                </div>
                             </div>
                             <div className="w-px h-3 bg-white/20"></div>
                             <div className="flex items-center gap-1.5 text-left">
