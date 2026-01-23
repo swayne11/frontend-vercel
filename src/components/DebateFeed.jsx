@@ -345,7 +345,7 @@ export default function DebateFeed() {
                             <div className="w-px h-3 bg-white/20"></div>
                             <div className="flex items-center gap-1.5">
                                 <Cpu className="w-3 h-3" />
-                                <span className="tracking-wider">{(tokenStats.total_tokens / 1000).toFixed(1)}k TOTAL TOKENS</span>
+                                <span className="tracking-wider whitespace-nowrap">{(tokenStats.total_tokens / 1000).toFixed(1)}k TOTAL TOKENS</span>
                             </div>
                         </div>
 
