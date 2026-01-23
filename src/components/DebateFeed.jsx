@@ -334,7 +334,7 @@ export default function DebateFeed() {
                     </div>
 
                     {/* Right: User Profile Data (Featured or Thinking) */}
-                    <div className="shrink-0 flex flex-col items-end w-full md:w-auto text-left md:text-right mt-1 md:mt-0">
+                    <div className="shrink-0 flex flex-col items-end w-full md:w-[320px] text-left md:text-right mt-1 md:mt-0 transition-all duration-200">
 
                         {/* [NEW] Token Stats Display - Technical/Broadcast Style */}
                         <div className="flex items-center gap-3 text-[10px] md:text-xs font-mono font-bold text-white/80 mb-2 bg-black/20 px-2 py-1 rounded-sm border border-black/10">
@@ -350,14 +350,14 @@ export default function DebateFeed() {
                         </div>
 
                         {currentUser && (
-                            <div className="flex flex-col items-end animate-fade-in-up">
+                            <div className="flex flex-col items-end animate-fade-in-up w-full">
                                 <div className={`text-yellow-300 text-[10px] md:text-xs font-black uppercase tracking-widest mb-0.5 flex items-center gap-1 transition-opacity duration-200 ${isThinking ? 'opacity-100 animate-pulse' : 'opacity-0'}`}>
                                     <span>Thinking</span>
                                     <span className="w-1 h-1 bg-yellow-300 rounded-full"></span>
                                     <span className="w-1 h-1 bg-yellow-300 rounded-full animation-delay-75"></span>
                                     <span className="w-1 h-1 bg-yellow-300 rounded-full animation-delay-150"></span>
                                 </div>
-                                <div className="font-bold text-sm md:text-xl uppercase tracking-tighter text-white leading-none">
+                                <div className="font-bold text-sm md:text-xl uppercase tracking-tighter text-white leading-none min-h-[2.5rem] flex items-end justify-end break-words w-full">
                                     {currentUser.name}
                                 </div>
                             </div>
