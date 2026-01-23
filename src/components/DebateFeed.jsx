@@ -340,12 +340,12 @@ export default function DebateFeed() {
                         <div className="flex items-center gap-3 text-[10px] md:text-xs font-mono font-bold text-white/80 mb-2 bg-black/20 px-2 py-1 rounded-sm border border-black/10">
                             <div className="flex items-center gap-1.5">
                                 <Zap className="w-3 h-3 text-yellow-300" fill="currentColor" />
-                                <span className="text-yellow-200 tracking-wider">{tokenStats.tps} TPS</span>
+                                <span className="text-yellow-200 tracking-wider">{tokenStats.tps} TOKENS/SECOND</span>
                             </div>
                             <div className="w-px h-3 bg-white/20"></div>
                             <div className="flex items-center gap-1.5">
                                 <Cpu className="w-3 h-3" />
-                                <span className="tracking-wider">{(tokenStats.total_tokens / 1000).toFixed(1)}k TOKENS</span>
+                                <span className="tracking-wider">{(tokenStats.total_tokens / 1000).toFixed(1)}k TOTAL TOKENS</span>
                             </div>
                         </div>
 
