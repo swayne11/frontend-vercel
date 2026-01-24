@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Analytics } from "@vercel/analytics/react"
 import DebateFeed from './components/DebateFeed'
 import AdminPanel from './components/AdminPanel'
 import MobileFeed from './components/MobileFeed'
@@ -25,6 +26,7 @@ function App() {
           <Route path="/mobile" element={<MobileFeed />} />
         </Routes>
       )}
+      <Analytics />
     </BrowserRouter>
   )
 }
